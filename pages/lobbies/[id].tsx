@@ -18,20 +18,21 @@ const NewQuestionButton: React.FC<NewQuestionButtonProps> = ({ lobby, user }) =>
     const onCreateNewQuestionClicked = () => {
         const questions = lobby.users[user.id].questions || []
 
-        questions.unshift({
-            id: randomId(),
-            question: ``,
-            correctAnswer: '',
-            misleadingAnswers: [ '', '', '' ],
-            userId: user.id
-        })
-
         // questions.unshift({
         //     id: randomId(),
-        //     question: randomId(),
-        //     correctAnswer: randomId(),
-        //     misleadingAnswers: [ randomId(), randomId(), randomId() ]
-        // })        
+        //     question: ``,
+        //     correctAnswer: '',
+        //     misleadingAnswers: [ '', '', '' ],
+        //     userId: user.id
+        // })
+
+        questions.unshift({
+            id: randomId(),
+            question: randomId(),
+            correctAnswer: randomId(),
+            misleadingAnswers: [ randomId(), randomId(), randomId() ],
+            userId: user.id
+        })        
 
         updateLobbyUser(lobby.id, user.id, {
             questions
@@ -142,6 +143,7 @@ interface QuestionsPanelProps {
     user: LobbyUser
 }
 
+const MIN_QUESTIONS = 2
 const QuestionsPanel: React.FC<QuestionsPanelProps> = ({ lobby, user }) => {
     const onReadyButtonClicked = async () => {
         await updateLobbyUser(lobby.id, user.id, { ready: !user.ready })
@@ -152,7 +154,7 @@ const QuestionsPanel: React.FC<QuestionsPanelProps> = ({ lobby, user }) => {
     const canReadyUp = () => {
         const questions = lobby.users[user.id].questions
 
-        if (questions.length < 5) return false
+        if (questions.length < MIN_QUESTIONS) return false
 
         for (let i = 0; i < questions.length; i ++) {
             const v = [questions[i].correctAnswer, questions[i].question, ...questions[i].misleadingAnswers]
@@ -181,7 +183,7 @@ const QuestionsPanel: React.FC<QuestionsPanelProps> = ({ lobby, user }) => {
         const randomizedUsers: LobbyUser[] = shuffleArray(Object.values(lobby.users))
         
         randomizedUsers.map((u) => u.questions.map((q) => ({ ...q, userId: u.id }))).forEach((qa) => { 
-            questions.push(...shuffleArray(qa).slice(0, 5))
+            questions.push(...shuffleArray(qa).slice(0, MIN_QUESTIONS))
         })
 
         return questions
@@ -206,7 +208,7 @@ const QuestionsPanel: React.FC<QuestionsPanelProps> = ({ lobby, user }) => {
                 user={lobby.users[user.id]}
             />
             <div style={{ flex: '0 0 50px', display: 'flex', padding: '8px', alignItems: 'center' }}>
-                <p style={{ fontSize: '12px', flexGrow: '1' }}>You have {questionLength} question{questionLength === 1 ? '' : 's'} in your question bank. You need at least 5 to start.</p>
+                <p style={{ fontSize: '12px', flexGrow: '1' }}>You have {questionLength} question{questionLength === 1 ? '' : 's'} in your question bank. You need at least {MIN_QUESTIONS} to start.</p>
                 <button disabled={!canReadyUp()} onClick={onReadyButtonClicked}>{user.ready ? "Unready" : "Ready Up"}</button>
                 {isHost() && <button disabled={!canStartGame()} style={{ marginLeft: '8px'}} onClick={onStartGameClicked}>Start Game</button>}
             </div>
@@ -357,7 +359,7 @@ const LobbyDetail: NextPage = () => {
 
         if (!Object.keys(lobby.users).includes(user.id)) {
             console.log(`Current user ${user.username} is not part of the displayed lobby. Adding them...`)
-            const users = lobby.users
+            const users: Record<string, LobbyUser> = {}
             users[user.id] = {
                 answered: false, 
                 ...user,

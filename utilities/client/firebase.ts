@@ -73,9 +73,10 @@ export const getLobby = async (id: string): Promise<Lobby | null> => {
 
 export const updateLobby = async (id: string, params: Partial<Lobby>): Promise<Lobby | null> => {
   console.log(`UPDATE: LOBBY: ${id}`)
-  await updateDoc(doc(db, "lobbies", id), {
+  console.log(params)
+  await setDoc(doc(db, "lobbies", id), {
     ...params
-  })
+  }, { merge: true })
 
   return getLobby(id)
 }

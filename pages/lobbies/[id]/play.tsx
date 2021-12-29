@@ -1,3 +1,4 @@
+import { Firestore, increment } from 'firebase/firestore'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { Fragment, useEffect, useState } from 'react'
@@ -37,7 +38,7 @@ const Play: NextPage = () => {
     const [isUserLoading, user] = useCurrentUser()
     const [currentQuestion, setCurrentQuestion] = useState<UserQuestion | null>(null)
     const [currentAnswers, setCurrentAnswers] = useState<string[]>([])
-    const [globalCountDown, setGlobalCountDown] = useState<number>(5)
+    const [globalCountDown, setGlobalCountDown] = useState<number>(2)
     const [currentQuestionAnswered, setCurrentQuestionAnswered] = useState<boolean>(false)
     const [lastAnswer, setLastAnswer] = useState<string>('')
     
@@ -49,6 +50,11 @@ const Play: NextPage = () => {
         }
 
         if (allPlayersAnswered()) {
+            if (lobby.questionIndex >= lobby.questions.length) {
+                router.replace(`/lobbies/${lobby.id}/leaderboard`)
+                return
+            }
+
             setGlobalCountDown(5)
         }
     }, [lobby])
@@ -60,12 +66,15 @@ const Play: NextPage = () => {
 
     const clearAnsweredStatus = async () => {
         if (!lobby) return
-        const users = lobby.users
-        Object.keys(users).forEach((userId) => {
+        const users: Record<string, Partial<LobbyUser>> = {}
+        Object.keys(lobby.users).forEach((userId) => {
+            users[userId] = {}
             users[userId].answered = false
         })
+
+        console.log('clearAnsweredStatus')
         await updateLobby(lobby.id, {
-            users
+            users: users as Record<string, LobbyUser>
         })
     }
 
@@ -100,16 +109,19 @@ const Play: NextPage = () => {
     const onAnswerClicked = (index: number) => {
         
         if (!lobby || !user) return
-        const users = lobby.users
+        const users: Record<string, any> = {}
+        users[user.id] = {}
         const selectedAnswer = currentAnswers[index]
         setLastAnswer(selectedAnswer)
+        
         if (selectedAnswer === currentQuestion?.correctAnswer) {
-            users[user.id].score += 20
+            users[user.id].score = increment(20)
         }
 
         users[user.id].answered = true
+        console.log('onAnswerClicked')
         updateLobby(lobby.id, {
-            users
+            users: users as Record<string, LobbyUser>
         })        
 
         setCurrentQuestionAnswered(true)
