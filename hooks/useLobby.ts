@@ -3,11 +3,14 @@ import { db, getLobby, Lobby } from '../utilities/client/firebase'
 import { doc, onSnapshot } from "firebase/firestore";
 
 export const useLobby = (id: string): [boolean, Lobby | null] => {
-    const [loading, setLoading] = useState<boolean>(true)
+    const [loading, setLoading] = useState<boolean>(false)
     const [lobby, setLobby] = useState<Lobby | null>(null)
 
     useEffect(() => { 
         if (!id) return
+        if (loading) return
+
+        setLoading(true);
 
         (async () => {
             const lobby = await getLobby(id)

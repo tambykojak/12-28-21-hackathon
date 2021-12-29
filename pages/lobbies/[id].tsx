@@ -33,7 +33,7 @@ const NewQuestionButton: React.FC<NewQuestionButtonProps> = ({ lobby, user }) =>
         //     misleadingAnswers: [ randomId(), randomId(), randomId() ]
         // })        
 
-        updateLobbyUser(lobby, user.id, {
+        updateLobbyUser(lobby.id, user.id, {
             questions
         })
     }
@@ -106,7 +106,7 @@ const QuestionsList: React.FC<QuestionsListProps> = ({ lobby, user}) => {
     const onEditQuestion = (newParams: UserQuestion) => {
         const indexToEdit = lobby.users[user.id].questions.findIndex((v) => v.id === newParams.id)
         lobby.users[user.id].questions[indexToEdit] = newParams
-        updateLobbyUser(lobby, user.id, {
+        updateLobbyUser(lobby.id, user.id, {
             questions: lobby.users[user.id].questions
         })
     }
@@ -115,7 +115,7 @@ const QuestionsList: React.FC<QuestionsListProps> = ({ lobby, user}) => {
         const indexToRemove = lobby.users[user.id].questions.findIndex((v) => v.id === question.id)
         lobby.users[user.id].questions.splice(indexToRemove, 1)
 
-        updateLobbyUser(lobby, user.id, { 
+        updateLobbyUser(lobby.id, user.id, { 
             questions: lobby.users[user.id].questions
         })
     }
@@ -144,7 +144,7 @@ interface QuestionsPanelProps {
 
 const QuestionsPanel: React.FC<QuestionsPanelProps> = ({ lobby, user }) => {
     const onReadyButtonClicked = async () => {
-        await updateLobbyUser(lobby, user.id, { ready: !user.ready })
+        await updateLobbyUser(lobby.id, user.id, { ready: !user.ready })
     }
 
     const questionLength = lobby.users[user.id].questions.length
@@ -188,6 +188,7 @@ const QuestionsPanel: React.FC<QuestionsPanelProps> = ({ lobby, user }) => {
     }
 
     const onStartGameClicked = () => {
+        console.log('start game')
         updateLobby(lobby.id, {
             isGameStarted: true,
             questions: prepareQuestions()
@@ -281,7 +282,7 @@ const UsernamePanel: React.FC<UsernamePanelProps> = ({ lobby, user }) => {
                 username: newUsername
             })
 
-            updateLobbyUser(lobby, user.id, { username: newUsername })
+            updateLobbyUser(lobby.id, user.id, { username: newUsername })
         })()
     }
 
@@ -366,6 +367,7 @@ const LobbyDetail: NextPage = () => {
                 score: 0
             }
             
+            console.log('use effect')
             updateLobby(lobby.id, {
                 users
             })

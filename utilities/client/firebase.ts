@@ -51,6 +51,7 @@ export const createAnonymousUser = async (): Promise<UserCredential> => {
 }
 
 export const createNewLobby = async (params: Omit<Lobby, 'id'>): Promise<string> => { 
+  console.log(`CREATE: LOBBY`)
   const id = randomId()
 
   await setDoc(doc(db, "lobbies", id), params);
@@ -59,7 +60,7 @@ export const createNewLobby = async (params: Omit<Lobby, 'id'>): Promise<string>
 }
 
 export const getLobby = async (id: string): Promise<Lobby | null> => {
-  console.log(`Attempting to fetch lobby with id ${id}.`)
+  console.log(`GET: LOBBY: ${id}`)
   const d = doc(db, "lobbies", id)
   const snapshot = await getDoc(d)
   if (!snapshot.exists()) return null 
@@ -71,7 +72,7 @@ export const getLobby = async (id: string): Promise<Lobby | null> => {
 }
 
 export const updateLobby = async (id: string, params: Partial<Lobby>): Promise<Lobby | null> => {
-  console.log(`Attempting to update lobby with id ${id}.`)
+  console.log(`UPDATE: LOBBY: ${id}`)
   await updateDoc(doc(db, "lobbies", id), {
     ...params
   })
@@ -79,36 +80,25 @@ export const updateLobby = async (id: string, params: Partial<Lobby>): Promise<L
   return getLobby(id)
 }
 
-export const updateLobbyUser = async (lobby: string | Lobby, userId: string, params: Partial<LobbyUser>): Promise<void> => {
-  let l
-
-  if (typeof lobby === "string") {
-    l = await getLobby(lobby)
-  } else { 
-    l = lobby
+export const updateLobbyUser = async (lobbyId: string, userId: string, params: Partial<LobbyUser>): Promise<void> => {
+  console.info(`UPDATE: LOBBY USER: ${lobbyId}, ${userId}`)
+  const userToUpdate: Record<string, any> = {}
+  userToUpdate[userId] = params
+  const setParams = {
+    users: userToUpdate
   }
-
-  if (l === null) return
-
-  const users = l.users
-  users[userId] = {
-    ...users[userId],
-    ...params
-  }
-
-  updateLobby(l.id, {
-    users
-  })    
+  await setDoc(doc(db, "lobbies", lobbyId), setParams, { merge: true })
 }
 
 export const createNewUser = async (id: string, params: Omit<User, 'id'>): Promise<string> => {
+  console.info("CREATE: USER")
   await setDoc(doc(db, "users", id), params);
 
   return id 
 }
 
 export const getUser = async (id: string): Promise<User> => {
-  console.log(`Attempting to fetch user with id ${id}.`)
+  console.log(`GET: USER: ${id}`)
   const snapshot = await getDoc(doc(db, "users", id))
   return { 
     id: snapshot.id,
@@ -117,7 +107,7 @@ export const getUser = async (id: string): Promise<User> => {
 }
 
 export const updateUser = async (id: string, params: Partial<User>): Promise<User> => {
-  console.log(`Attempting to update user with id ${id}.`)
+  console.log(`UPDATE: USER: ${id}`)
   await updateDoc(doc(db, "users", id), {
     ...params
   })
