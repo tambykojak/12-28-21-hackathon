@@ -15,7 +15,7 @@ const Index: NextPage = () => {
 
     (async () => {
       const users: Record<string, LobbyUser> = {}
-      users[user.id] = { ...user, score: 0, joinedLobbyAt: Timestamp.now(), ready: false, questions: [] }
+      users[user.id] = { answered: false, ...user, score: 0, joinedLobbyAt: Timestamp.now(), ready: false, questions: [] }
       const lobbyId = await createNewLobby({ questions: [], questionIndex: 0, isGameStarted: false, hostId: user.id, users })
       router.push(`/lobbies/${lobbyId}`)
     })()

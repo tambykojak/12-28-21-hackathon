@@ -18,19 +18,20 @@ const NewQuestionButton: React.FC<NewQuestionButtonProps> = ({ lobby, user }) =>
     const onCreateNewQuestionClicked = () => {
         const questions = lobby.users[user.id].questions || []
 
-        // questions.unshift({
-        //     id: randomId(),
-        //     question: ``,
-        //     correctAnswer: '',
-        //     misleadingAnswers: [ '', '', '' ]
-        // })
-
         questions.unshift({
             id: randomId(),
-            question: randomId(),
-            correctAnswer: randomId(),
-            misleadingAnswers: [ randomId(), randomId(), randomId() ]
-        })        
+            question: ``,
+            correctAnswer: '',
+            misleadingAnswers: [ '', '', '' ],
+            userId: user.id
+        })
+
+        // questions.unshift({
+        //     id: randomId(),
+        //     question: randomId(),
+        //     correctAnswer: randomId(),
+        //     misleadingAnswers: [ randomId(), randomId(), randomId() ]
+        // })        
 
         updateLobbyUser(lobby, user.id, {
             questions
@@ -63,6 +64,7 @@ const QuestionListItem: React.FC<QuestionListItemProps> = ({ lobby, user, questi
         const timeout = setTimeout(() => {
             onEditQuestion({
                 id: question.id,
+                userId: user.id,
                 question: questionText,
                 correctAnswer: correctAnswer,
                 misleadingAnswers: [misleadingAnswer1, misleadingAnswer2, misleadingAnswer3]
@@ -356,6 +358,7 @@ const LobbyDetail: NextPage = () => {
             console.log(`Current user ${user.username} is not part of the displayed lobby. Adding them...`)
             const users = lobby.users
             users[user.id] = {
+                answered: false, 
                 ...user,
                 ready: false,
                 joinedLobbyAt: Timestamp.now(),
