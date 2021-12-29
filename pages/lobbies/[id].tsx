@@ -198,7 +198,7 @@ const QuestionsPanel: React.FC<QuestionsPanelProps> = ({ lobby, user }) => {
         <div style={{ backgroundColor: 'white', flex: '1', minHeight: '65%', maxHeight: '65%', marginTop: '32px', padding: '8px', display: 'flex', flexDirection: 'column'}}>
             <div style={{ flex: '0 0 50px' }}>
                 <p style={{ fontSize: "18px", fontWeight: "bold"}}>Your question bank</p>
-                <p style={{ fontSize: "14px"}}>The questions you create below will be asked to your friends in this lobby to test how well they know you. You'll probably want to cater the questions to the group that you're playing with.</p>
+                <p style={{ fontSize: "14px"}}>The questions you create below will be asked to your friends in this lobby to test how well they know you. You will probably want to cater the questions to the group that you are playing with.</p>
             </div>
             <QuestionsList 
                 lobby={lobby}
