@@ -1,21 +1,24 @@
+import { Timestamp } from 'firebase/firestore'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import useUserId from '../hooks/useUserId'
+import useCurrentUser from '../hooks/useCurrentUser'
 
 import styles from '../styles/Index.module.css'
-import { createNewLobby } from '../utilities/client/firebase'
+import { createNewLobby, LobbyUser, User } from '../utilities/client/firebase'
 
 const Index: NextPage = () => {
   const router = useRouter()
-  const userId = useUserId()
+  const [isCurrentUserLoading, user] = useCurrentUser()
 
   const onCreateNewLobbyClicked = () => {
-    const createLobby = async () => {
-      const lobbyId = await createNewLobby({})
-      router.push(`/lobby/${lobbyId}`)
-    }
+    if (!user) return
 
-    createLobby()
+    (async () => {
+      const users: Record<string, LobbyUser> = {}
+      users[user.id] = { ...user, score: 0, joinedLobbyAt: Timestamp.now(), ready: false, questions: [] }
+      const lobbyId = await createNewLobby({ questions: [], questionIndex: 0, isGameStarted: false, hostId: user.id, users })
+      router.push(`/lobbies/${lobbyId}`)
+    })()
   }
 
   return (
@@ -24,10 +27,6 @@ const Index: NextPage = () => {
         <p className={styles.logo}>Logo goes here</p>
         <h1 className={styles.title}>TEST YOUR FRIENDSHIP</h1>
         <p className={styles.subtitle}>Prove who your real friends are</p>
-        <div>
-          <input type="text" placeholder="Input Game Code"/>
-          <button>Join Game</button>
-        </div>
         <div>
           <button onClick={onCreateNewLobbyClicked}>Create New Lobby</button>
         </div>
