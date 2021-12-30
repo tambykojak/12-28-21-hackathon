@@ -18,21 +18,21 @@ const NewQuestionButton: React.FC<NewQuestionButtonProps> = ({ lobby, user }) =>
     const onCreateNewQuestionClicked = () => {
         const questions = lobby.users[user.id].questions || []
 
-        // questions.unshift({
-        //     id: randomId(),
-        //     question: ``,
-        //     correctAnswer: '',
-        //     misleadingAnswers: [ '', '', '' ],
-        //     userId: user.id
-        // })
-
         questions.unshift({
             id: randomId(),
-            question: randomId(),
-            correctAnswer: randomId() + "right",
-            misleadingAnswers: [ randomId(), randomId(), randomId() ],
+            question: ``,
+            correctAnswer: '',
+            misleadingAnswers: [ '', '', '' ],
             userId: user.id
         })
+
+        // questions.unshift({
+        //     id: randomId(),
+        //     question: randomId(),
+        //     correctAnswer: randomId() + "right",
+        //     misleadingAnswers: [ randomId(), randomId(), randomId() ],
+        //     userId: user.id
+        // })
 
         updateLobbyUser(lobby.id, user.id, {
             questions
