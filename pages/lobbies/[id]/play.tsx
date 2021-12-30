@@ -14,13 +14,13 @@ interface LobbyUserProps {
 const PlayerCard: React.FC<LobbyUserProps & { player: LobbyUser }> = ({ lobby, player }) => {
     const status = player.answered ? "[Answered]" : '[Waiting]'
     return <div style={{ padding: "8px", borderStyle: 'solid', marginBottom: '16px', display: 'flex' }}>
-        <div style={{ fontSize: '8px', alignSelf: 'center'}}>{status}</div>
+        <div style={{ fontSize: '10px', alignSelf: 'center', marginRight: '4px', fontWeight: 'bold'}}>{status}</div>
         <div style={{ flexGrow: 1 }}>{player.username}</div>
         <div>{player.score || 0}</div>
     </div>
 } 
 
-const PlayersList: React.FC<LobbyUserProps> = ({ lobby }) => { 
+const PlayersList: React.FC<LobbyUserProps> = ({ lobby }) => {
     return (
         <div style={{ margin: '16px' }}>
             <h1>Players</h1>
@@ -38,7 +38,7 @@ const Play: NextPage = () => {
     const [isUserLoading, user] = useCurrentUser()
     const [currentQuestion, setCurrentQuestion] = useState<UserQuestion | null>(null)
     const [currentAnswers, setCurrentAnswers] = useState<string[]>([])
-    const [globalCountDown, setGlobalCountDown] = useState<number>(2)
+    const [globalCountDown, setGlobalCountDown] = useState<number>(5)
     const [currentQuestionAnswered, setCurrentQuestionAnswered] = useState<boolean>(false)
     const [lastAnswer, setLastAnswer] = useState<string>('')
     
@@ -72,7 +72,6 @@ const Play: NextPage = () => {
             users[userId].answered = false
         })
 
-        console.log('clearAnsweredStatus')
         await updateLobby(lobby.id, {
             users: users as Record<string, LobbyUser>
         })
@@ -95,7 +94,7 @@ const Play: NextPage = () => {
             setCurrentAnswers(shuffleArray([nextQuestion.correctAnswer, ...nextQuestion.misleadingAnswers]))
             updateLobby(lobby.id, {
                 questionIndex: lobby.questionIndex + 1
-            })            
+            })
         }
         )()
     }
@@ -125,17 +124,17 @@ const Play: NextPage = () => {
         setCurrentQuestionAnswered(true)
     }
 
-    if (isLobbyLoading || !lobby || !user) return <div style={{ backgroundColor: "#4ea8d5" }}></div>
+    if (isLobbyLoading || !lobby || !user) return <div style={{ }}></div>
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'row', backgroundColor: '#4ea8d5', height: '100vh' }}>
+        <div style={{ display: 'flex', flexDirection: 'row', height: '100vh' }}>
             <div style={{ backgroundColor: 'white', flex: 1, height: '100%' }}>
                 <PlayersList lobby={lobby} />
             </div>
-            <div style={{ backgroundColor: '#4ea8d5', flex: 3, flexDirection: 'column', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                {globalCountDown ? <div style={{fontSize: '100px', backgroundColor: 'green', justifySelf: 'center', textAlign: 'center'}}>{globalCountDown}</div> : <Fragment/>}
+            <div style={{ flex: 3, flexDirection: 'column', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                {globalCountDown ? <div style={{fontSize: '100px', backgroundColor: 'white', borderColor: 'black', boxShadow: '0px 2px 5px 0px', borderRadius: '125px', minWidth: '250px', minHeight: '250px', justifySelf: 'center', textAlign: 'center', alignItems: 'center', justifyContent: 'center', display: 'flex'}}>{globalCountDown}</div> : <Fragment/>}
                 {globalCountDown === 0 && currentQuestion ? (
-                    <div style={{backgroundColor: 'red', margin: '16px', padding: '16px'}}>
+                    <div style={{backgroundColor: 'white', margin: '16px', padding: '16px', borderRadius: '12px'}}>
                         <h4 style={{textAlign: 'center'}}>A question from {lobby.users[currentQuestion.userId].username}.</h4>
                         <h2 style={{textAlign: 'center'}}>{currentQuestion.question}</h2>
                         <div style={{ display: 'flex' }}>
@@ -145,10 +144,10 @@ const Play: NextPage = () => {
                         <div style={{ display: 'flex'}}>
                             <button disabled={lobby.users[user.id].answered} onClick={() => onAnswerClicked(2)} style={{margin: "16px", minWidth: '200px', minHeight: '32px', flex: 1}}>{currentAnswers[2]}</button>
                             <button disabled={lobby.users[user.id].answered} onClick={() => onAnswerClicked(3)} style={{margin: "16px", minWidth: '200px',minHeight: '32px', flex: 1}}>{currentAnswers[3]}</button>                            
-                        </div>                        
+                        </div>
                     </div>
                 ): <Fragment />}
-                {globalCountDown === 0 && currentQuestion && lobby.users[user.id].answered ? (<div>
+                {currentQuestion && lobby.users[user.id].answered ? (<div style={{ marginTop: '16px', backgroundColor: 'white', padding: '8px', borderRadius: '8px', boxShadow: '0px 2px 10px 0px'}}>
                     { lastAnswer === currentQuestion?.correctAnswer ? 
                     (<div>You were correct! +20 points.</div>) : 
                     (<div>You were incorrect, the right answer was {currentQuestion?.correctAnswer}.</div>)

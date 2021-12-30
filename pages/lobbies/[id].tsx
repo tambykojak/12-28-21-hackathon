@@ -18,21 +18,21 @@ const NewQuestionButton: React.FC<NewQuestionButtonProps> = ({ lobby, user }) =>
     const onCreateNewQuestionClicked = () => {
         const questions = lobby.users[user.id].questions || []
 
-        questions.unshift({
-            id: randomId(),
-            question: ``,
-            correctAnswer: '',
-            misleadingAnswers: [ '', '', '' ],
-            userId: user.id
-        })
-
         // questions.unshift({
         //     id: randomId(),
-        //     question: randomId(),
-        //     correctAnswer: randomId(),
-        //     misleadingAnswers: [ randomId(), randomId(), randomId() ],
+        //     question: ``,
+        //     correctAnswer: '',
+        //     misleadingAnswers: [ '', '', '' ],
         //     userId: user.id
-        // })        
+        // })
+
+        questions.unshift({
+            id: randomId(),
+            question: randomId(),
+            correctAnswer: randomId() + "right",
+            misleadingAnswers: [ randomId(), randomId(), randomId() ],
+            userId: user.id
+        })
 
         updateLobbyUser(lobby.id, user.id, {
             questions
@@ -40,9 +40,10 @@ const NewQuestionButton: React.FC<NewQuestionButtonProps> = ({ lobby, user }) =>
     }
 
     return (
-        <div style={{ height: "120px", borderStyle: 'dashed', padding: "8px" }}>
-            <button disabled={lobby.users[user.id].ready} onClick={onCreateNewQuestionClicked}>Create a new question</button>
-        </div>     
+        <div style={{ display: 'flex', marginRight: '16px' }}>
+            <div style={{ flexGrow: 1 }}></div>
+            <button disabled={lobby.users[user.id].ready} onClick={onCreateNewQuestionClicked}>Add a question</button>
+        </div>
     )
 }
 
@@ -78,7 +79,7 @@ const QuestionListItem: React.FC<QuestionListItemProps> = ({ lobby, user, questi
     }, [questionText, correctAnswer, misleadingAnswer1, misleadingAnswer2, misleadingAnswer3])
 
     return (
-        <div style={{ padding: '16px', minHeight: "120px", borderStyle: 'solid', marginTop: "16px"}}>
+        <div style={{ padding: '16px', marginLeft: '16px', marginRight: '16px', minHeight: "120px", borderStyle: 'solid', borderWidth: '2px', marginTop: '16px', marginBottom: "32px"}}>
             <input style={{ width: '100%',}} disabled={lobby.users[user.id].ready} value={questionText} placeholder='Your question here' onChange={(e) => setQuestionText(e.target.value)}/>
             <div style={{display: 'flex', flexDirection: 'column'}}>
                 <p style={{ marginTop: '8px'}}>What is the correct answer? <input disabled={lobby.users[user.id].ready} value={correctAnswer} onChange={(e) => setCorrectAnswer(e.target.value)}/></p>
@@ -122,7 +123,7 @@ const QuestionsList: React.FC<QuestionsListProps> = ({ lobby, user}) => {
     }
 
     return (
-        <div style={{ minHeight: '0px', flex: 1, overflowY: 'scroll', marginTop: "16px", padding: "16px", borderStyle: "solid" }}>
+        <div style={{ minHeight: '0px', flex: 1, overflowY: 'scroll', marginTop: "16px", padding: "16px", borderStyle: "solid", borderRadius: '20px', borderColor: "gray", borderWidth: '1px', boxShadow: '1px 1px 5px 0px'}}>
             <NewQuestionButton lobby={lobby} user={user}/>         
             {(lobby.users[user.id].questions || []).map((q) => (
                 <QuestionListItem
@@ -190,7 +191,6 @@ const QuestionsPanel: React.FC<QuestionsPanelProps> = ({ lobby, user }) => {
     }
 
     const onStartGameClicked = () => {
-        console.log('start game')
         updateLobby(lobby.id, {
             isGameStarted: true,
             questions: prepareQuestions()
@@ -198,17 +198,17 @@ const QuestionsPanel: React.FC<QuestionsPanelProps> = ({ lobby, user }) => {
     }
 
     return (
-        <div style={{ backgroundColor: 'white', flex: '1', minHeight: '65%', maxHeight: '65%', marginTop: '32px', padding: '8px', display: 'flex', flexDirection: 'column'}}>
+        <div style={{ backgroundColor: 'white', flex: '1', minHeight: '65%', maxHeight: '100%', display: 'flex', flexDirection: 'column'}} className={styles.panel}>
             <div style={{ flex: '0 0 50px' }}>
                 <p style={{ fontSize: "18px", fontWeight: "bold"}}>Your question bank</p>
                 <p style={{ fontSize: "14px"}}>The questions you create below will be asked to your friends in this lobby to test how well they know you. You will probably want to cater the questions to the group that you are playing with.</p>
             </div>
-            <QuestionsList 
+            <QuestionsList
                 lobby={lobby}
                 user={lobby.users[user.id]}
             />
             <div style={{ flex: '0 0 50px', display: 'flex', padding: '8px', alignItems: 'center' }}>
-                <p style={{ fontSize: '12px', flexGrow: '1' }}>You have {questionLength} question{questionLength === 1 ? '' : 's'} in your question bank. You need at least {MIN_QUESTIONS} to start.</p>
+                <p style={{ fontSize: '12px', flexGrow: '1' }}>You have {questionLength} question{questionLength === 1 ? '' : 's'} in your question bank. You need at least {MIN_QUESTIONS} <strong>completely filled out</strong> questions to start.</p>
                 <button disabled={!canReadyUp()} onClick={onReadyButtonClicked}>{user.ready ? "Unready" : "Ready Up"}</button>
                 {isHost() && <button disabled={!canStartGame()} style={{ marginLeft: '8px'}} onClick={onStartGameClicked}>Start Game</button>}
             </div>
@@ -230,7 +230,7 @@ const ParticipantsPanel: React.FC<ParticipantsPanelProps> = ({ user, lobby }) =>
 
     return (
         <div className={`${styles.participantsContainer} ${styles.panel}`}>
-            <h2 style={{ marginTop: '0px', marginBottom: '0px'}}>Friends in Lobby</h2>
+            <h2 style={{ marginTop: '0px', marginBottom: '16px' }}>Friends in Lobby</h2>
             {sortedUserIds().map((userId) => {
                 let preUsernameLabel = "[Not Ready]"
 
@@ -242,7 +242,7 @@ const ParticipantsPanel: React.FC<ParticipantsPanelProps> = ({ user, lobby }) =>
                 if (userId === lobby.hostId) postUsernameLabel += " (Host)"
 
                 return (
-                    <p key={userId}>{preUsernameLabel} {lobby.users[userId].username}{postUsernameLabel}</p>
+                    <p key={userId}><strong>{preUsernameLabel}</strong> {lobby.users[userId].username}{postUsernameLabel}</p>
                 )
             })}
         </div>    
@@ -306,7 +306,7 @@ const UsernamePanel: React.FC<UsernamePanelProps> = ({ lobby, user }) => {
 
     return (
         <div className={`${styles.yourUsernameContainer} ${styles.panel}`}>
-            <p className={styles.yourUsernamePrompt}>Update your username here. Use your real first name for fun easter eggs.</p>
+            <p className={styles.yourUsernamePrompt}>Update your username here.</p>
             <input disabled={lobby.users[user.id].ready} className={styles.yourUsernameInput} type="text" defaultValue={user.username} onChange={(e) => setUsernameInput(e.target.value)}/>
             <p className={styles.yourUsernameError}>{errorMessage}</p>
         </div>
@@ -320,16 +320,16 @@ interface LobbyUrlPanelProps {
 const LobbyUrlPanel: React.FC<LobbyUrlPanelProps> = ({}) => {
     const onCopyLinkClicked = () => {
         navigator.clipboard.writeText(window.location.toString())
-    }    
+    }
 
     return (
-        <div className={styles.lobbyUrlContainer}>
+        <div className={`${styles.lobbyUrlContainer} ${styles.panel}`}>
             <p className={styles.lobbyUrlPrompt}>Share the link below with your friends!</p>
             <div style={{ display: 'flex' }}>
                 <input readOnly className={styles.lobbyUrlInput} type="text" value={window.location.toString()}/>
                 <button style={{ flex: 1 }} onClick={onCopyLinkClicked}>Copy Link</button>
             </div>
-        </div>        
+        </div>
     )
 }
 
@@ -385,17 +385,19 @@ const LobbyDetail: NextPage = () => {
     return (
         <div className={styles.page}>
             <div className={styles.container}>
-                <ParticipantsPanel 
-                    user={user}
-                    lobby={lobby}
-                />
-                <div className={styles.rightSideContainer}>
-                    <UsernamePanel 
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <UsernamePanel
                         lobby={lobby}
                         user={user}
                     />
-                    <QuestionsPanel lobby={lobby} user={lobby.users[user.id]} />
+                    <ParticipantsPanel 
+                        user={user}
+                        lobby={lobby}
+                    />
                     <LobbyUrlPanel />
+                </div>
+                <div className={styles.rightSideContainer}>
+                    <QuestionsPanel lobby={lobby} user={lobby.users[user.id]} />
                 </div>
             </div>
         </div>

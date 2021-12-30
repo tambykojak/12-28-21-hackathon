@@ -79,3 +79,9 @@ button:disabled {
   cursor: not-allowed;
   opacity: 1;
 }
+
+input {
+  background: 0;
+  border-style: inset;
+  padding: 8px;
+}
