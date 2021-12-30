@@ -107,9 +107,8 @@ const Play: NextPage = () => {
     }, [globalCountDown])
 
     const onAnswerClicked = (index: number) => {
-        
         if (!lobby || !user) return
-        const users: Record<string, any> = {}
+        const users: Record<string, any > = {}
         users[user.id] = {}
         const selectedAnswer = currentAnswers[index]
         setLastAnswer(selectedAnswer)
@@ -119,10 +118,9 @@ const Play: NextPage = () => {
         }
 
         users[user.id].answered = true
-        console.log('onAnswerClicked')
         updateLobby(lobby.id, {
             users: users as Record<string, LobbyUser>
-        })        
+        })
 
         setCurrentQuestionAnswered(true)
     }

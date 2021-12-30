@@ -18,21 +18,21 @@ const NewQuestionButton: React.FC<NewQuestionButtonProps> = ({ lobby, user }) =>
     const onCreateNewQuestionClicked = () => {
         const questions = lobby.users[user.id].questions || []
 
-        // questions.unshift({
-        //     id: randomId(),
-        //     question: ``,
-        //     correctAnswer: '',
-        //     misleadingAnswers: [ '', '', '' ],
-        //     userId: user.id
-        // })
-
         questions.unshift({
             id: randomId(),
-            question: randomId(),
-            correctAnswer: randomId(),
-            misleadingAnswers: [ randomId(), randomId(), randomId() ],
+            question: ``,
+            correctAnswer: '',
+            misleadingAnswers: [ '', '', '' ],
             userId: user.id
-        })        
+        })
+
+        // questions.unshift({
+        //     id: randomId(),
+        //     question: randomId(),
+        //     correctAnswer: randomId(),
+        //     misleadingAnswers: [ randomId(), randomId(), randomId() ],
+        //     userId: user.id
+        // })        
 
         updateLobbyUser(lobby.id, user.id, {
             questions
@@ -143,7 +143,7 @@ interface QuestionsPanelProps {
     user: LobbyUser
 }
 
-const MIN_QUESTIONS = 2
+const MIN_QUESTIONS = 3
 const QuestionsPanel: React.FC<QuestionsPanelProps> = ({ lobby, user }) => {
     const onReadyButtonClicked = async () => {
         await updateLobbyUser(lobby.id, user.id, { ready: !user.ready })
@@ -229,8 +229,8 @@ const ParticipantsPanel: React.FC<ParticipantsPanelProps> = ({ user, lobby }) =>
     }
 
     return (
-        <div className={styles.participantsContainer}>
-            <h2>Friends in Lobby</h2>
+        <div className={`${styles.participantsContainer} ${styles.panel}`}>
+            <h2 style={{ marginTop: '0px', marginBottom: '0px'}}>Friends in Lobby</h2>
             {sortedUserIds().map((userId) => {
                 let preUsernameLabel = "[Not Ready]"
 
@@ -305,7 +305,7 @@ const UsernamePanel: React.FC<UsernamePanelProps> = ({ lobby, user }) => {
     }
 
     return (
-        <div className={styles.yourUsernameContainer}>
+        <div className={`${styles.yourUsernameContainer} ${styles.panel}`}>
             <p className={styles.yourUsernamePrompt}>Update your username here. Use your real first name for fun easter eggs.</p>
             <input disabled={lobby.users[user.id].ready} className={styles.yourUsernameInput} type="text" defaultValue={user.username} onChange={(e) => setUsernameInput(e.target.value)}/>
             <p className={styles.yourUsernameError}>{errorMessage}</p>
